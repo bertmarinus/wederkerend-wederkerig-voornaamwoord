@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wederkerend of wederkerig voornaamwoord - LearnForge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5568d3;
+            --card-bg: #ffffff;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --success: #48bb78;
+            --error: #f56565;
+        }
+
+        body {
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #fce7f3 50%, #dbeafe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            transition: color 0.3s;
+        }
+        .back-link:hover { color: var(--primary); }
+
+        /* SCORE BALK — vereenvoudigd */
+        .score-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 18px;
+            padding: 14px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .score-teller {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 21px;
+            font-weight: 700;
+            color: var(--primary);
+            background: #e0e7ff;
+            padding: 6px 18px;
+            border-radius: 20px;
+        }
+
+        .reset-btn {
+            background: none;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover { border-color: var(--error); color: var(--error); }
+
+        /* VRAAGKAART */
+        .question-card {
+            background: var(--primary);
+            border-radius: 24px;
+            padding: 36px 44px;
+            margin-bottom: 22px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .question-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0.75;
+            margin-bottom: 14px;
+        }
+
+        .question-sentence {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        /* CONTENT KAART */
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 38px 44px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-icon {
+            width: 68px; height: 68px;
+            border-radius: 18px;
+            background: #dbeafe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            margin: 0 auto 18px;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-dark);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .card-subtitle {
+            color: var(--text-light);
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        /* INVOERVELDEN */
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+
+        .input-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 18px 22px;
+            border: 3px solid var(--border);
+            border-radius: 16px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+        }
+
+        .text-input::placeholder { color: #cbd5e0; }
+
+        /* KNOPPEN */
+        .button-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 14px;
+        }
+
+        .btn-check {
+            padding: 16px 24px;
+            background: var(--primary);
+            border: none;
+            border-radius: 14px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-check:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-hint {
+            padding: 16px 24px;
+            background: #fef3c7;
+            border: 2px solid #f6d860;
+            border-radius: 14px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: #92400e;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-hint:hover { background: #fde68a; transform: translateY(-2px); }
+
+        /* FEEDBACK POPUPS */
+        .feedback-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+            animation: fadeIn 0.15s ease;
+        }
+
+        .feedback-popup {
+            width: 340px;
+            border-radius: 28px;
+            padding: 44px 36px 38px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        .feedback-popup.goed { background: #4caf7d; }
+        .feedback-popup.fout { background: #e86060; }
+
+        .feedback-cirkel {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .feedback-tekst {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 34px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .feedback-sub {
+            font-family: 'Nunito', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* HINT MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        .modal-content {
+            background: white;
+            border-radius: 22px;
+            padding: 32px 40px;
+            max-width: 460px;
+            width: 92%;
+            text-align: left;
+            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        @keyframes popIn {
+            from { opacity:0; transform:scale(0.85); }
+            to   { opacity:1; transform:scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .modal-icon-circle {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: #dbeafe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .hint-subtext {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .hint-tips { list-style: none; padding: 0; }
+
+        .hint-tips li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 9px 0;
+            font-size: 16px;
+            color: var(--text-dark);
+            border-bottom: 1px solid var(--border);
+            line-height: 1.5;
+        }
+
+        .hint-tips li:last-child { border-bottom: none; }
+
+        .hint-tips li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 22px;
+            line-height: 1.1;
+            flex-shrink: 0;
+        }
+
+        .modal-footer { margin-top: 22px; text-align: right; }
+
+        .btn-ok {
+            padding: 12px 32px;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 14px rgba(102,126,234,0.35);
+        }
+
+        .btn-ok:hover { transform: translateY(-2px); }
+
+        /* EINDSCHERM */
+        .eindscherm { display: none; text-align: center; }
+
+        .eind-score {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 72px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 8px 0;
+        }
+
+        .eind-label { color: var(--text-light); font-size: 16px; margin-bottom: 16px; }
+
+        .eind-bericht {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 28px;
+        }
+
+        .final-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            padding: 14px 24px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+
+        .btn-success {
+            padding: 14px 24px;
+            background: var(--success);
+            border: none;
+            border-radius: 14px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .content-card { padding: 26px 20px; }
+            .question-card { padding: 28px 20px; }
+            .question-sentence { font-size: 24px; }
+            .input-row { grid-template-columns: 1fr; gap: 10px; }
+            .text-input { font-size: 18px; padding: 14px 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- Terug link -->
+    <div style="display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap;">
+        <a href="https://bertmarinus.github.io/learnforge/" class="back-link">🏠 Hoofdmenu</a>
+        <a href="https://bertmarinus.github.io/learnforge/" class="back-link">← Terug naar overzicht</a>
+    </div>
+
+    <!-- Vraagkaart -->
+    <div class="question-card" id="questionCard">
+        <div class="question-label">Wederkerend of wederkerig voornaamwoord?</div>
+        <div class="question-sentence" id="questionSentence">…</div>
+    </div>
+
+    <!-- Oefening kaart -->
+    <div class="content-card" id="oefeningCard">
+        <div class="card-icon">🔄</div>
+        <div class="card-title">Wederkerend of wederkerig?</div>
+        <div class="card-subtitle">Vul links het type in en rechts het woord zelf.</div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <div class="input-label">TYPE</div>
+                <input type="text" class="text-input" id="typeInput"
+                    placeholder="wederkerend / wederkerig"
+                    autocomplete="off" autocorrect="off" autocapitalize="none"
+                    spellcheck="false" enterkeyhint="next">
+            </div>
+            <div class="input-group">
+                <div class="input-label">WOORD</div>
+                <input type="text" class="text-input" id="woordInput"
+                    placeholder="me / zich / elkaar"
+                    autocomplete="off" autocorrect="off" autocapitalize="none"
+                    spellcheck="false" enterkeyhint="done">
+            </div>
+        </div>
+
+        <div class="button-row">
+            <button class="btn-hint" onclick="showHint()">💡 Hint</button>
+            <button class="btn-check" onclick="controleer()">✓ Controleer</button>
+        </div>
+    </div>
+
+    <!-- Eindscherm -->
+    <div class="content-card eindscherm" id="eindscherm">
+        <div class="card-icon" style="background:#d1fae5;">🏆</div>
+        <div class="card-title">Alle zinnen gehad!</div>
+        <div class="eind-score" id="eindScore">0/0</div>
+        <div class="eind-label">goed / totaal geprobeerd</div>
+        <div class="eind-bericht" id="eindBericht"></div>
+        <div class="final-buttons">
+            <button class="btn-secondary" onclick="herstart()">🔁 Opnieuw</button>
+            <a href="https://bertmarinus.github.io/learnforge/" class="btn-success">← Terug naar overzicht</a>
+            <a href="https://bertmarinus.github.io/learnforge/" class="btn-secondary">🏠 Hoofdmenu</a>
+        </div>
+    </div>
+
+</div>
+
+<!-- FEEDBACK: GOED -->
+<div class="feedback-overlay hidden" id="feedbackGoed">
+    <div class="feedback-popup goed">
+        <div class="feedback-cirkel">✔</div>
+        <div class="feedback-tekst">Goed zo! 🎉</div>
+        <div class="feedback-sub" id="feedbackGoedSub"></div>
+    </div>
+</div>
+
+<!-- FEEDBACK: FOUT -->
+<div class="feedback-overlay hidden" id="feedbackFout">
+    <div class="feedback-popup fout">
+        <div class="feedback-cirkel">✕</div>
+        <div class="feedback-tekst">Helaas!</div>
+        <div class="feedback-sub" id="feedbackFoutSub"></div>
+    </div>
+</div>
+
+<!-- HINT MODAL -->
+<div class="modal-overlay hidden" id="modalHint">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-icon-circle">💡</div>
+            <div class="modal-title">Hint</div>
+        </div>
+        <div class="hint-subtext">Hoe herken ik het verschil?</div>
+        <ul class="hint-tips">
+            <li>Een <strong>wederkerend</strong> voornaamwoord gebruik je als iemand iets met zichzelf doet. Bijvoorbeeld: <em>zich schamen, me vergissen</em>.</li>
+            <li>Een <strong>wederkerig</strong> voornaamwoord gebruik je als twee of meer personen iets bij elkaar doen. Bijvoorbeeld: <em>elkaar helpen</em>.</li>
+            <li>Vul links <em>wederkerend</em> of <em>wederkerig</em> in en rechts het woord zelf (zoals <em>zich, me</em> of <em>elkaar</em>).</li>
+        </ul>
+        <div class="modal-footer">
+            <button class="btn-ok" onclick="sluitHint()">OK</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // GELUIDJES - Simpele beeps
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playGoedGeluid() {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.value = 800;
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.15);
+    }
+
+    function playFoutGeluid() {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.frequency.value = 200;
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.2);
+    }
+
+    // ============================================================
+    // DATA — 200 zinnen: wederkerend (me / zich) + wederkerig (elkaar)
+    // ============================================================
+    const alleOefeningen = [
+
+        // --- WEDERKEREND: me ---
+        { zin: "Ik vergis me soms in de datum.", type: "wederkerend", woord: "me" },
+        { zin: "Ik schaam me voor mijn gedrag.", type: "wederkerend", woord: "me" },
+        { zin: "Ik verveel me thuis.", type: "wederkerend", woord: "me" },
+        { zin: "Ik voel me niet lekker vandaag.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me gesneden aan het mes.", type: "wederkerend", woord: "me" },
+        { zin: "Ik was me elke ochtend.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me verslapen.", type: "wederkerend", woord: "me" },
+        { zin: "Ik herinner me die dag nog goed.", type: "wederkerend", woord: "me" },
+        { zin: "Ik amuseer me in het park.", type: "wederkerend", woord: "me" },
+        { zin: "Ik gedraag me netjes bij de gasten.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me gestoten aan de tafel.", type: "wederkerend", woord: "me" },
+        { zin: "Ik verheug me op de vakantie.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me vergist bij de rekening.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me aangemeld voor de cursus.", type: "wederkerend", woord: "me" },
+        { zin: "Ik realiseer me nu wat er is gebeurd.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me laten leiden door mijn gevoel.", type: "wederkerend", woord: "me" },
+        { zin: "Ik beweeg me langzaam door de menigte.", type: "wederkerend", woord: "me" },
+        { zin: "Ik concentreer me op het werk.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me goed voorbereid op het gesprek.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me ingeschreven bij de sportschool.", type: "wederkerend", woord: "me" },
+        { zin: "Ik erger me aan het lawaai buiten.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me goed gevoeld na de training.", type: "wederkerend", woord: "me" },
+        { zin: "Ik herstel me langzaam van de griep.", type: "wederkerend", woord: "me" },
+        { zin: "Ik bevind me momenteel in een lastige situatie.", type: "wederkerend", woord: "me" },
+        { zin: "Ik trek me niets aan van die opmerking.", type: "wederkerend", woord: "me" },
+        { zin: "Ik laat me niet afleiden door de drukte.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me helemaal ingezet voor dit project.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me uitgeschreven bij de club.", type: "wederkerend", woord: "me" },
+        { zin: "Ik heb me laten testen voor het virus.", type: "wederkerend", woord: "me" },
+        { zin: "Ik stel me voor als de nieuwe leerling.", type: "wederkerend", woord: "me" },
+
+        // --- WEDERKEREND: zich ---
+        { zin: "Hij schaamt zich voor zijn fout.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij verveelt zich in de les.", type: "wederkerend", woord: "zich" },
+        { zin: "Het kind herstelt zich snel.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij vergist zich in het antwoord.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij bereidt zich voor op het examen.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij wast zich iedere avond.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij herinnert zich de vakantie.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij gedraagt zich goed op school.", type: "wederkerend", woord: "zich" },
+        { zin: "De kat likt zich schoon.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij heeft zich bezeerd aan zijn knie.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij amuseert zich prima op het feest.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij voelt zich prima na zijn vakantie.", type: "wederkerend", woord: "zich" },
+        { zin: "De hond heeft zich verstopt onder de tafel.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij vergist zich regelmatig in de tijd.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij heeft zich aangemeld voor het toernooi.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij realiseert zich dat ze te laat is.", type: "wederkerend", woord: "zich" },
+        { zin: "Het bedrijf heeft zich goed ontwikkeld.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij beweegt zich snel door het publiek.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij concentreert zich op haar tekening.", type: "wederkerend", woord: "zich" },
+        { zin: "De vogel heeft zich gewond aan het glas.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij stelt zich voor aan de nieuwe buurman.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij heeft zich goed voorbereid op de presentatie.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij verheugde zich op het weekend.", type: "wederkerend", woord: "zich" },
+        { zin: "De leerling gedraagt zich rustig in de klas.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij heeft zich laten inschrijven voor de wedstrijd.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij ergert zich aan het lawaai buiten.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij heeft zich verslapen en mist de trein.", type: "wederkerend", woord: "zich" },
+        { zin: "De baby heeft zich omgedraaid in zijn bedje.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij schaamt zich diep voor zijn leugen.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij laat zich niet afleiden door de drukte.", type: "wederkerend", woord: "zich" },
+        { zin: "De directeur heeft zich verontschuldigd.", type: "wederkerend", woord: "zich" },
+        { zin: "Het meisje had zich gesneden met een schaar.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij verbergt zich achter een stapel boeken.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij heeft zich ingeschreven voor de cursus.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij geeft zich volledig voor zijn team.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij vergist zich steeds in de spelling.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij amuseert zich met een goed boek.", type: "wederkerend", woord: "zich" },
+        { zin: "De politicus heeft zich teruggetrokken uit de race.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij herstelt zich langzaam van zijn blessure.", type: "wederkerend", woord: "zich" },
+        { zin: "Het paard heeft zich losgemaakt uit de stal.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij schaamt zich als ze een fout maakt.", type: "wederkerend", woord: "zich" },
+        { zin: "De speler heeft zich sterk ontwikkeld dit seizoen.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij bevindt zich momenteel in het buitenland.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij realiseert zich de ernst van de situatie.", type: "wederkerend", woord: "zich" },
+        { zin: "De student heeft zich goed ingespannen voor het examen.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij laat zich niet snel ontmoedigen.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij trekt zich niets aan van de kritiek.", type: "wederkerend", woord: "zich" },
+        { zin: "De kat heeft zich opgerold op de bank.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij heeft zich niet goed gevoeld de afgelopen dagen.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij heeft zich uitgeschreven bij de sportclub.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij laat zich leiden door zijn intuïtie.", type: "wederkerend", woord: "zich" },
+        { zin: "De patiënt heeft zich snel hersteld.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij heeft zich vastgehouden aan de leuning.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij wast zich voor hij naar bed gaat.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij stelde zich voor als de nieuwe directrice.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij legt zich neer bij de uitslag.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij heeft zich erg ingespannen voor de groep.", type: "wederkerend", woord: "zich" },
+        { zin: "Het kind verwondt zich gemakkelijk.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij amuseert zich uitstekend op het festival.", type: "wederkerend", woord: "zich" },
+        { zin: "De hond schaamt zich na zijn straf.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij vergist zich zelden bij rekenen.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij heeft zich laten testen op het virus.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij verheugde zich al weken op de uitvoering.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij gedraagt zich voorbeeldig bij de leerkracht.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij heeft zich goed aangepast aan de nieuwe school.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij ergert zich aan het voortdurende getoeter.", type: "wederkerend", woord: "zich" },
+        { zin: "De renner heeft zich opgeofferd voor zijn ploeg.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij laat zich niet van de wijs brengen.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij heeft zich aangemeld als vrijwilliger.", type: "wederkerend", woord: "zich" },
+        { zin: "Het kind heeft zich verstopt in de kast.", type: "wederkerend", woord: "zich" },
+        { zin: "Hij trekt zich terug in zijn kamer.", type: "wederkerend", woord: "zich" },
+        { zin: "Zij realiseert zich wat ze is vergeten.", type: "wederkerend", woord: "zich" },
+
+        // --- WEDERKERIG: elkaar ---
+        { zin: "Zij helpen elkaar met het schilderen van de kamer.", type: "wederkerig", woord: "elkaar" },
+        { zin: "We bellen elkaar om plannen te maken.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De kinderen pesten elkaar op het schoolplein.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze kennen elkaar al jaren.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze groeten elkaar iedere ochtend.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze begrijpen elkaar heel goed.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De vrienden steunen elkaar door moeilijke tijden.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze ontmoeten elkaar in het café.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De broers helpen elkaar met huiswerk.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze schrijven elkaar elke week een brief.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze bewonderen elkaar om hun talenten.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De collega's respecteren elkaar op het werk.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar met de verhuizing.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze sturen elkaar berichten via de telefoon.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze treffen elkaar bij de supermarkt.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze kijken elkaar niet meer aan na de ruzie.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De teamleden vertrouwen elkaar volledig.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze feliciteren elkaar na de wedstrijd.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De buren kennen elkaar goed.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze vermijden elkaar na het conflict.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze leren elkaar kennen tijdens de cursus.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De spelers geven elkaar een high five.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar in de keuken.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De kinderen spelen leuk met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze kunnen goed met elkaar opschieten.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De teamleden motiveren elkaar tijdens de training.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze controleren elkaars werk voor de deadline.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De zussen bellen elkaar elke zondag.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze corrigeren elkaar als ze een fout maken.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De vrienden troosten elkaar na het verlies.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze concurreren vriendelijk met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De collega's dekken elkaar tijdens ziekte.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze wensen elkaar veel succes voor het examen.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De buren helpen elkaar bij een storm.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze volgen elkaar op sociale media.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De jongens helpen elkaar met sjouwen.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze hebben veel voor elkaar over.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De docenten overleggen regelmatig met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze vinden het fijn om met elkaar te praten.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze spelen al jaren samen met elkaar voetbal.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze begroeten elkaar hartelijk bij de ingang.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De broer en zus helpen elkaar in de tuin.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze omhelzen elkaar na het nieuws.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze adviseren elkaar bij moeilijke keuzes.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De studenten leren van elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze vertrouwen elkaar blindelings.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze maken grappen met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze geven elkaar cadeaus met kerst.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar met het leren van de stof.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze hebben al lang niet meer met elkaar gesproken.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze delen de taken eerlijk met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze lachen veel met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze hebben elkaar veel te vertellen.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze wandelen elke avond met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze hebben elkaar leren kennen op school.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De vrienden denken aan elkaar in moeilijke tijden.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze trekken veel met elkaar op.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze zijn altijd eerlijk tegen elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar graag als dat nodig is.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze inspireren elkaar met hun ideeën.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De leden van de band kennen elkaar door en door.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze kritiseren elkaars werk constructief.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De atleten pushen elkaar naar betere prestaties.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze staan altijd voor elkaar klaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze bespreken plannen met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De meisjes wisselen kleding uit met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze luisteren goed naar elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze lenen boeken van elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar het huiswerk in te halen.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze sturen elkaar foto's van de vakantie.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De broers kijken naar elkaar met bewondering.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze sporten regelmatig samen met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze respecteren elkaars mening.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze halen het beste uit elkaar naar boven.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze koken wekelijks samen voor elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze interviewen elkaar voor het schoolproject.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar met het oefenen van teksten.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze motiveren elkaar om door te gaan.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze stellen teleurstellingen bespreekbaar met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "De broer en zus missen elkaar enorm.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze zoeken regelmatig contact met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze delen lief en leed met elkaar.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze houden rekening met elkaars gevoel.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze houden van elkaars gezelschap.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze vragen elkaars mening over het plan.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze feliciteren elkaar met de verjaardag.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar met de boodschappen.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze zien elkaar elke dag na school.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze begrijpen elkaars gevoel van humor.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze steunen elkaar bij de examens.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar met het opruimen van de klas.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze nemen elkaars taken over als dat nodig is.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze feliciteren elkaar na het behalen van het diploma.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze wachten altijd op elkaar bij de schoolpoort.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar herinneren aan afspraken.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze controleren elkaars spelfouten in het opstel.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze helpen elkaar bij het maken van een werkstuk.", type: "wederkerig", woord: "elkaar" },
+        { zin: "Ze vertellen elkaar wat ze die dag hebben meegemaakt.", type: "wederkerig", woord: "elkaar" },
+    ];
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    let oefeningen = shuffle(alleOefeningen);
+    let huidigIndex = 0;
+    let aantalGoed  = 0;
+    let aantalFout  = 0;
+    let bezig       = false;
+    let feedbackTimer = null;
+
+    function laadOefening(index) {
+        if (index >= oefeningen.length) { toonEindscherm(); return; }
+        document.getElementById('questionSentence').textContent = oefeningen[index].zin;
+        const t = document.getElementById('typeInput');
+        const w = document.getElementById('woordInput');
+        t.value = ''; w.value = '';
+        t.disabled = false; w.disabled = false;
+        t.className = 'text-input'; w.className = 'text-input';
+        bezig = false;
+        setTimeout(function() { t.focus(); }, 50);
+    }
+
+    function controleer() {
+        if (bezig) return;
+        if (!document.getElementById('modalHint').classList.contains('hidden')) return;
+        const typeInvoer  = document.getElementById('typeInput').value.trim().toLowerCase();
+        const woordInvoer = document.getElementById('woordInput').value.trim().toLowerCase();
+        if (!typeInvoer || !woordInvoer) return;
+
+        bezig = true;
+        document.getElementById('typeInput').disabled  = true;
+        document.getElementById('woordInput').disabled = true;
+
+        const juistType  = oefeningen[huidigIndex].type.toLowerCase();
+        const juistWoord = oefeningen[huidigIndex].woord.toLowerCase();
+        const typGoed    = typeInvoer  === juistType;
+        const woordGoed  = woordInvoer === juistWoord;
+
+        if (typGoed && woordGoed) {
+            aantalGoed++;
+            playGoedGeluid();
+            toonFeedback('goed', '"' + oefeningen[huidigIndex].type + '" — "' + oefeningen[huidigIndex].woord + '" ✓', 1400);
+        } else {
+            aantalFout++;
+            playFoutGeluid();
+            let sub = 'Antwoord: ' + oefeningen[huidigIndex].type + ' — ' + oefeningen[huidigIndex].woord;
+            if (!typGoed && woordGoed)  sub = 'Type klopt niet. Antwoord: '  + oefeningen[huidigIndex].type + ' — ' + oefeningen[huidigIndex].woord;
+            if (typGoed  && !woordGoed) sub = 'Woord klopt niet. Antwoord: ' + oefeningen[huidigIndex].type + ' — ' + oefeningen[huidigIndex].woord;
+            toonFeedback('fout', sub, 2400);
+        }
+        updateScoreBalk();
+    }
+
+    function toonFeedback(type, subtekst, duur) {
+        sluitAlleFeedback();
+        if (type === 'goed') {
+            document.getElementById('feedbackGoedSub').textContent = subtekst;
+            document.getElementById('feedbackGoed').classList.remove('hidden');
+        } else {
+            document.getElementById('feedbackFoutSub').textContent = subtekst;
+            document.getElementById('feedbackFout').classList.remove('hidden');
+        }
+        feedbackTimer = setTimeout(function() {
+            sluitAlleFeedback();
+            huidigIndex++;
+            laadOefening(huidigIndex);
+        }, duur);
+    }
+
+    function sluitAlleFeedback() {
+        document.getElementById('feedbackGoed').classList.add('hidden');
+        document.getElementById('feedbackFout').classList.add('hidden');
+        if (feedbackTimer) { clearTimeout(feedbackTimer); feedbackTimer = null; }
+    }
+
+    function updateScoreBalk() {
+        document.getElementById('scoreTeller').textContent = aantalGoed + ' / ' + (aantalGoed + aantalFout);
+    }
+
+    function resetScore() {
+        aantalGoed = aantalFout = 0;
+        updateScoreBalk();
+    }
+
+    function showHint() {
+        document.getElementById('modalHint').classList.remove('hidden');
+    }
+
+    function sluitHint() {
+        document.getElementById('modalHint').classList.add('hidden');
+    }
+
+    function toonEindscherm() {
+        document.getElementById('oefeningCard').style.display  = 'none';
+        document.getElementById('questionCard').style.display  = 'none';
+        document.getElementById('eindscherm').style.display    = 'block';
+        const totaal = aantalGoed + aantalFout;
+        document.getElementById('eindScore').textContent = aantalGoed + ' / ' + totaal;
+        const r = totaal > 0 ? aantalGoed / totaal : 0;
+        document.getElementById('eindBericht').textContent =
+            r === 1   ? '🌟 Fantastisch! Alles goed!' :
+            r >= 0.75 ? '👍 Goed gedaan! Blijf oefenen!' :
+            r >= 0.5  ? '🙂 Aardig werk, oefen nog wat meer.' :
+                        '💪 Blijf oefenen, het lukt je!';
+    }
+
+    function herstart() {
+        oefeningen = shuffle(alleOefeningen);
+        aantalGoed = aantalFout = huidigIndex = 0;
+        updateScoreBalk();
+        document.getElementById('oefeningCard').style.display  = 'block';
+        document.getElementById('questionCard').style.display  = 'block';
+        document.getElementById('eindscherm').style.display    = 'none';
+        laadOefening(0);
+    }
+
+    // Enter in typeInput → focus naar woordInput
+    document.getElementById('typeInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('woordInput').focus(); }
+    });
+
+    // Enter in woordInput → controleer
+    document.getElementById('woordInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); controleer(); }
+    });
+    document.getElementById('woordInput').addEventListener('keyup', function(e) {
+        if (e.keyCode === 13) { e.preventDefault(); controleer(); }
+    });
+
+    // START — altijd in willekeurige volgorde
+    laadOefening(0);
+</script>
+</body>
+</html>
